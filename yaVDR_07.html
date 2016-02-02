@@ -1,0 +1,667 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>RFC yaVDR 0.7</title>
+<!-- 2016-02-02 Di 15:41 -->
+<meta  http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta  name="generator" content="Org-mode" />
+<meta  name="author" content="Alexander Grothe" />
+<style type="text/css">
+ <!--/*--><![CDATA[/*><!--*/
+  .title  { text-align: center; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { color: green; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #ccc;
+    box-shadow: 3px 3px 3px #eee;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: visible;
+    padding-top: 1.2em;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    background-color: white;
+    top: -10px;
+    right: 10px;
+    padding: 3px;
+    border: 1px solid black;
+  }
+  pre.src:hover:before { display: inline;}
+  pre.src-sh:before    { content: 'sh'; }
+  pre.src-bash:before  { content: 'sh'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-R:before     { content: 'R'; }
+  pre.src-perl:before  { content: 'Perl'; }
+  pre.src-java:before  { content: 'Java'; }
+  pre.src-sql:before   { content: 'SQL'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.right  { text-align: center;  }
+  th.left   { text-align: center;   }
+  th.center { text-align: center; }
+  td.right  { text-align: right;  }
+  td.left   { text-align: left;   }
+  td.center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara:nth-child(2) { display: inline; }
+  .footpara { display: block; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  /*]]>*/-->
+</style>
+<link rel="stylesheet" type="text/css" href="styles/bigblow/css/htmlize.css"/>
+<link rel="stylesheet" type="text/css" href="styles/bigblow/css/bigblow.css"/>
+<link rel="stylesheet" type="text/css" href="styles/bigblow/css/hideshow.css"/>
+<script type="text/javascript" src="styles/bigblow/js/jquery-1.11.0.min.js"></script>
+<script type="text/javascript" src="styles/bigblow/js/jquery-ui-1.10.2.min.js"></script>
+<script type="text/javascript" src="styles/bigblow/js/jquery.localscroll-min.js"></script>
+<script type="text/javascript" src="styles/bigblow/js/jquery.scrollTo-1.4.3.1-min.js"></script>
+<script type="text/javascript" src="styles/bigblow/js/jquery.zclip.min.js"></script>
+<script type="text/javascript" src="styles/bigblow/js/bigblow.js"></script>
+<script type="text/javascript" src="styles/bigblow/js/hideshow.js"></script>
+<script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+<script type="text/javascript">
+/*
+@licstart  The following is the entire license notice for the
+JavaScript code in this tag.
+
+Copyright (C) 2012-2013 Free Software Foundation, Inc.
+
+The JavaScript code in this tag is free software: you can
+redistribute it and/or modify it under the terms of the GNU
+General Public License (GNU GPL) as published by the Free Software
+Foundation, either version 3 of the License, or (at your option)
+any later version.  The code is distributed WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+As additional permission under GNU GPL version 3 section 7, you
+may distribute non-source (e.g., minimized or compacted) forms of
+that code without the copy of the GNU GPL normally required by
+section 4, provided you include this license notice and a URL
+through which recipients can access the Corresponding Source.
+
+
+@licend  The above is the entire license notice
+for the JavaScript code in this tag.
+*/
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+</head>
+<body>
+<div id="content">
+<h1 class="title">RFC yaVDR 0.7</h1>
+<div id="table-of-contents">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents">
+<ul>
+<li><a href="#sec-1">1. Paketstruktur für yaVDR 0.7</a>
+<ul>
+<li><a href="#sec-1-1">1.1. yavdr-core</a>
+<ul>
+<li><a href="#sec-1-1-1">1.1.1. Abhängigkeiten:</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-2">1.2. yavdr-remote</a>
+<ul>
+<li><a href="#sec-1-2-1">1.2.1. Abhängigkeiten</a></li>
+<li><a href="#sec-1-2-2">1.2.2. Arbeitsliste für yavdr-remote</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-3">1.3. yavdr-xorg</a>
+<ul>
+<li><a href="#sec-1-3-1">1.3.1. Abhängigkeiten</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-4">1.4. yavdr-pulseaudio</a>
+<ul>
+<li><a href="#sec-1-4-1">1.4.1. Abhängigkeiten</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-5">1.5. yavdr-network</a>
+<ul>
+<li><a href="#sec-1-5-1">1.5.1. Abhängigkeiten</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-6">1.6. yavdr-webfrontend</a>
+<ul>
+<li><a href="#sec-1-6-1">1.6.1. Gewünschte Funktionen:</a></li>
+</ul>
+</li>
+<li><a href="#sec-1-7">1.7. Metapakete für verschiedene Systemkonfigurationen:</a>
+<ul>
+<li><a href="#sec-1-7-1">1.7.1. yavdr-server</a></li>
+<li><a href="#sec-1-7-2">1.7.2. yavdr-xorg-full</a></li>
+<li><a href="#sec-1-7-3">1.7.3. yavdr-xorg-client</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#sec-2">2. eventlircd</a>
+<ul>
+<li><a href="#sec-2-1">2.1. <span class="todo TODO">TODO</span> udev-Regeln überarbeiten</a></li>
+<li><a href="#sec-2-2">2.2. <span class="todo WAIT">WAIT</span> lircd_helper-Skript anpassen</a></li>
+</ul>
+</li>
+<li><a href="#sec-3">3. Verzeichnisstruktur</a></li>
+</ul>
+</div>
+</div>
+
+<div id="outline-container-sec-1" class="outline-2">
+<h2 id="sec-1"><span class="section-number-2">1</span> Paketstruktur für yaVDR 0.7</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Um einen möglichst modularen Aufbau für yaVDR 0.7 zu erreichen, werden die folgenden Kernpakete definiert:
+</p>
+</div>
+<div id="outline-container-sec-1-1" class="outline-3">
+<h3 id="sec-1-1"><span class="section-number-3">1.1</span> yavdr-core</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+Andere yavdr-* Pakete dürfen Abhängigkeiten zu diesem Paket besitzen
+</p>
+</div>
+<div id="outline-container-sec-1-1-1" class="outline-4">
+<h4 id="sec-1-1-1"><span class="section-number-4">1.1.1</span> Abhängigkeiten:</h4>
+<div class="outline-text-4" id="text-1-1-1">
+</div><ol class="org-ol"><li><a id="sec-1-1-1-1" name="sec-1-1-1-1"></a>linux-firmware<br  /></li>
+<li><a id="sec-1-1-1-2" name="sec-1-1-1-2"></a>linux-firmware-nonfree<br  /></li>
+<li><a id="sec-1-1-1-3" name="sec-1-1-1-3"></a>linux-firmware-yavdr<br  /></li>
+<li><a id="sec-1-1-1-4" name="sec-1-1-1-4"></a>vdr<br  /><ol class="org-ol"><li><a id="sec-1-1-1-4-1" name="sec-1-1-1-4-1"></a><span class="todo TODO">TODO</span> udev-Regel für DVB-Geräte, um das Warten auf Geräte zu vereinfachen:<br  /><div class="outline-text-6" id="text-1-1-1-4-1">
+<div class="org-src-container">
+
+<pre class="src src-udev">SUBSYSTEM=="dvb", TAG+="systemd"
+</pre>
+</div>
+<p>
+Damit kann mit so einem Snippet auf DVB-Karten gewartet werden:
+<b>/etc/systemd/system/vdr.service.d/wait-for-dvb.conf</b>
+</p>
+<div class="org-src-container">
+
+<pre class="src src-conf">[Unit]
+Wants=dev-dvb-adapter0-frontend0.device
+Wants=dev-dvb-adapter0-demux0.device
+Wants=dev-dvb-adapter0-dvr0.device
+Wants=dev-dvb-adapter0-net0.device
+After=dev-dvb-adapter0-frontend0.device
+After=dev-dvb-adapter0-demux0.device
+After=dev-dvb-adapter0-dvr0.device
+After=dev-dvb-adapter0-net0.device
+</pre>
+</div>
+
+<p>
+Alternativ auch eine eigene Unit wait-for-dvb@.service, die vor dem VDR gestartet werden muss und die man jeweils von Hand für eine bestimmte Adapter-Nummer aktiviert:
+</p>
+
+<div class="org-src-container">
+
+<pre class="src src-conf">[Unit]
+Wants=dev-dvb-adapter%i-frontend0.device
+Wants=dev-dvb-adapter%i-demux0.device
+Wants=dev-dvb-adapter%i-dvr0.device
+Wants=dev-dvb-adapter%i-net0.device
+After=dev-dvb-adapter%i-frontend0.device
+After=dev-dvb-adapter%i-demux0.device
+After=dev-dvb-adapter%i-dvr0.device
+After=dev-dvb-adapter%i-net0.device
+Before=vdr
+WantedBy=vdr
+
+[Install]
+WantedBy=multi-user.target
+</pre>
+</div>
+
+<p>
+Und die kann man dann z.B. mit systemctl enable wait-for-dvb@0.service aktivieren.
+</p>
+</div>
+</li>
+<li><a id="sec-1-1-1-4-2" name="sec-1-1-1-4-2"></a><span class="todo TODO">TODO</span> Fixes aus Debian-Paketen übernehmen, PR an Lars<br  /></li></ol>
+</li>
+<li><a id="sec-1-1-1-5" name="sec-1-1-1-5"></a>vdrctl<br  /><div class="outline-text-5" id="text-1-1-1-5">
+<p>
+erleichtert die Konfiguration der Startoptionen für den VDR
+</p>
+</div>
+</li>
+
+<li><a id="sec-1-1-1-6" name="sec-1-1-1-6"></a>vdr-addon-lifeguard(ng)<br  /><ol class="org-ol"><li><a id="sec-1-1-1-6-1" name="sec-1-1-1-6-1"></a><span class="todo TODO">TODO</span> ggf. durch lifeguard-ng ersetzen, das nicht mehr als Hook, sondern als Systemdienst läuft und Shutdown-Inhibitoren setzt, wenn der Rechner nicht heruntergefahren werden darf.<br  /></li>
+<li><a id="sec-1-1-1-6-2" name="sec-1-1-1-6-2"></a><span class="todo TODO">TODO</span> DBus-Interface, um aktuellen Status abzufragen und Inhibitoren zu setzen.<br  /></li></ol>
+</li>
+<li><a id="sec-1-1-1-7" name="sec-1-1-1-7"></a>vdr-addon-acpiwakeup(ng)<br  /><ol class="org-ol"><li><a id="sec-1-1-1-7-1" name="sec-1-1-1-7-1"></a><span class="todo TODO">TODO</span> durch acpi-wakeupng ersetzen, das als Dienst läuft und auch von anderen Clients wie z.B. KODI Aufwachzeiten übernehmen kann<br  /><ol class="org-ol"><li><a id="sec-1-1-1-7-1-1" name="sec-1-1-1-7-1-1"></a><span class="todo SOMEDAY">SOMEDAY</span> nvram-wakeup unterstützen<br  /></li></ol>
+</li></ol>
+</li>
+<li><a id="sec-1-1-1-8" name="sec-1-1-1-8"></a>vim<br  /><div class="outline-text-5" id="text-1-1-1-8">
+<p>
+Damit wenigstens ein vernünftiger Texteditor dabei ist ;)
+</p>
+</div>
+</li></ol>
+</div>
+</div>
+<div id="outline-container-sec-1-2" class="outline-3">
+<h3 id="sec-1-2"><span class="section-number-3">1.2</span> yavdr-remote</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+Paket mit allen Konfigurationsdateien und Skripten für Fernbedienungen mit folgenden
+</p>
+</div>
+<div id="outline-container-sec-1-2-1" class="outline-4">
+<h4 id="sec-1-2-1"><span class="section-number-4">1.2.1</span> Abhängigkeiten</h4>
+<div class="outline-text-4" id="text-1-2-1">
+</div><ol class="org-ol"><li><a id="sec-1-2-1-1" name="sec-1-2-1-1"></a>ir-keytable<br  /><div class="outline-text-5" id="text-1-2-1-1">
+<p>
+für die Konfiguration von rc-core Geräten
+</p>
+</div>
+</li>
+<li><a id="sec-1-2-1-2" name="sec-1-2-1-2"></a>eventlircd<br  /><div class="outline-text-5" id="text-1-2-1-2">
+<p>
+liest Events von Kernel Input Devices, die das udev-Attribut ENV{eventlircd_enable}="true" besitzen und gibt diese auf einem Lircd-kompatiblen Sockel <b>/run/lirc/lircd</b> aus. Mittels ENV{eventlircd_evmap}="&lt;evmap&gt;" kann eine Datei übergeben werden, die ein Remapping der Tasten erlaubt. Diese Funktionalität wird genutzt, um namespace-konforme Tastendrücke zu erhalten.
+</p>
+</div>
+</li>
+<li><a id="sec-1-2-1-3" name="sec-1-2-1-3"></a>lircd2uinput<br  /><div class="outline-text-5" id="text-1-2-1-3">
+<p>
+liest von einem oder mehreren Lircd-kompatiblen Sockeln und reicht die Tastendrücke über uinput weiter.
+Wird es ohne Argumente gestartet, sucht es nach einer <b>/var/run/lircd/lircd.pid</b> und bindet sich bei Erfolg an den dazugehörigen Lirc-Sockel. Wird mit dem Argument -s der Pfad für einen Sockel übergeben, liest es von diesem. 
+Es erzeugt ein DBus-Interface auf <b>de.yavdr.lircd2unput</b> und kann darüber Steuerungsbefehle annehmen, um Lircd-kompatible Sockel zur Auswertung hinzuzufügen, zu entfernen oder Tastendrücke abzusetzen.
+Folgende Beispielskripte liegen bei:
+</p>
+<ul class="org-ul">
+<li>lircd2uinput-send KEY_NAME: sendet einen Tastendrück
+</li>
+<li>lircd2uinput-add &lt;Pfad&gt; [&lt;key_up_suffix&gt;]: lässt lircd2uinput einen weiteren Sockel auswerten, das key_up_suffix kann genutzt werden, um das Loslassen einer Taste anzuzeigen (wie es z.B. bei lircd mit &#x2013;release[=suffix] erzeugt werden kann).
+</li>
+<li>lircd2uinput-remove &lt;Pfad&gt;: beendet die Auswertung eines Sockels
+</li>
+</ul>
+</div>
+</li>
+<li><a id="sec-1-2-1-4" name="sec-1-2-1-4"></a>lirc<br  /><div class="outline-text-5" id="text-1-2-1-4">
+<p>
+Wertet die Events der klassischen Fernbedienungen aus. 
+</p>
+</div>
+</li>
+<li><a id="sec-1-2-1-5" name="sec-1-2-1-5"></a>irserver<br  /><div class="outline-text-5" id="text-1-2-1-5">
+<p>
+Daemon für die iRTrans-Geräte. Bekommt eine udev-Regel, die den (noch zu schreibenden) Service irserver@.service startet.
+</p>
+</div>
+<ol class="org-ol"><li><a id="sec-1-2-1-5-1" name="sec-1-2-1-5-1"></a><span class="todo TODO">TODO</span> systemd Service irserver@.service schreiben<br  /></li></ol>
+</li>
+<li><a id="sec-1-2-1-6" name="sec-1-2-1-6"></a>ps3remote<br  /><div class="outline-text-5" id="text-1-2-1-6">
+<p>
+Daemon, der von PS3-Fernbedienungen liest und die Tastendrücke für eventlircd aufbereitet
+</p>
+</div>
+<ol class="org-ol"><li><a id="sec-1-2-1-6-1" name="sec-1-2-1-6-1"></a><span class="todo TODO">TODO</span> für Python3 überarbeiten, vereinfachen<br  /></li></ol>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-2-2" class="outline-4">
+<h4 id="sec-1-2-2"><span class="section-number-4">1.2.2</span> Arbeitsliste für yavdr-remote</h4>
+<div class="outline-text-4" id="text-1-2-2">
+</div><ol class="org-ol"><li><a id="sec-1-2-2-1" name="sec-1-2-2-1"></a><span class="todo TODO">TODO</span> systemd-Unit lircd.service schreiben, die mit den bestehenden Konfigurationsdateien umgehen kann<br  /></li>
+<li><a id="sec-1-2-2-2" name="sec-1-2-2-2"></a><span class="todo TODO">TODO</span> Snippet, der lircd2uinput über den neuen Sockel informiert, wenn lircd.service gestartet wurde<br  /></li>
+<li><a id="sec-1-2-2-3" name="sec-1-2-2-3"></a><span class="todo TODO">TODO</span> Snippet, der lircd2uinput über den neuen Sockel informiert, wenn irserver@.service gestartet wurde<br  /></li>
+<li><a id="sec-1-2-2-4" name="sec-1-2-2-4"></a><span class="todo TODO">TODO</span> systemd-Unit lircd@.service schreiben, die weitere Lircd-Instanzen für über udev einbindbare Geräte erlaubt<br  /></li>
+<li><a id="sec-1-2-2-5" name="sec-1-2-2-5"></a><span class="todo TODO">TODO</span> udev-Regel und irserver@.service für irtrans-USB Geräte anlegen:<br  /><div class="outline-text-5" id="text-1-2-2-5">
+<div class="org-src-container">
+
+<pre class="src src-udev">SUBSYSTEM=="tty", DRIVERS=="ftdi_sio", ATTRS{interface}=="IRTrans USB", ACTION=="add", LINK="irserver-%n", TAG+="systemd", ENV{SYSTEMD_WANTS}+="irserver@irserver-%n.service"
+</pre>
+</div>
+</div>
+</li></ol>
+</div>
+</div>
+<div id="outline-container-sec-1-3" class="outline-3">
+<h3 id="sec-1-3"><span class="section-number-3">1.3</span> yavdr-xorg</h3>
+<div class="outline-text-3" id="text-1-3">
+<p>
+Bringt alles mit, um einen X-Server mit openbox als Window Manager zu starten und das VDR-Frontend (Voreinstellung: softhddevice) anzuzeigen.
+</p>
+</div>
+<div id="outline-container-sec-1-3-1" class="outline-4">
+<h4 id="sec-1-3-1"><span class="section-number-4">1.3.1</span> Abhängigkeiten</h4>
+<div class="outline-text-4" id="text-1-3-1">
+<ul class="org-ul">
+<li>feh
+</li>
+<li>openbox
+</li>
+<li>gnome-icon-theme
+</li>
+<li>i965-va-driver
+</li>
+<li>vdr-frontend
+</li>
+<li>x11-utils
+</li>
+<li>x11-xserver-utils
+</li>
+<li>xfonts-base
+</li>
+<li>xterm
+</li>
+<li>xserver-xorg
+</li>
+<li>xserver-xorg-video-vesa
+</li>
+<li>xserver-xorg-video-intel
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-4" class="outline-3">
+<h3 id="sec-1-4"><span class="section-number-3">1.4</span> yavdr-pulseaudio</h3>
+<div class="outline-text-3" id="text-1-4">
+<p>
+Erlaubt es pulseaudio zu nutzen
+</p>
+</div>
+<div id="outline-container-sec-1-4-1" class="outline-4">
+<h4 id="sec-1-4-1"><span class="section-number-4">1.4.1</span> Abhängigkeiten</h4>
+<div class="outline-text-4" id="text-1-4-1">
+<ul class="org-ul">
+<li>pulseaudio
+</li>
+<li>pulseaudio-utils
+</li>
+<li>pavucontrol
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-sec-1-5" class="outline-3">
+<h3 id="sec-1-5"><span class="section-number-3">1.5</span> yavdr-network</h3>
+<div class="outline-text-3" id="text-1-5">
+<p>
+Netzwerkfunktionalität für yaVDR
+</p>
+</div>
+<div id="outline-container-sec-1-5-1" class="outline-4">
+<h4 id="sec-1-5-1"><span class="section-number-4">1.5.1</span> Abhängigkeiten</h4>
+<div class="outline-text-4" id="text-1-5-1">
+</div><ol class="org-ol"><li><a id="sec-1-5-1-1" name="sec-1-5-1-1"></a>vdr-addon-avahi-mounter<br  /></li>
+<li><a id="sec-1-5-1-2" name="sec-1-5-1-2"></a>yavdr-hostwakeup<br  /></li>
+<li><a id="sec-1-5-1-3" name="sec-1-5-1-3"></a>vdr-plugin-avahi4vdr<br  /></li>
+<li><a id="sec-1-5-1-4" name="sec-1-5-1-4"></a>vdr-plugin-restfulapi<br  /></li></ol>
+</div>
+</div>
+<div id="outline-container-sec-1-6" class="outline-3">
+<h3 id="sec-1-6"><span class="section-number-3">1.6</span> yavdr-webfrontend</h3>
+<div class="outline-text-3" id="text-1-6">
+<p>
+Erlaubt die Konfiguration des Systems über ein Webinterface.
+</p>
+</div>
+<div id="outline-container-sec-1-6-1" class="outline-4">
+<h4 id="sec-1-6-1"><span class="section-number-4">1.6.1</span> Gewünschte Funktionen:</h4>
+<div class="outline-text-4" id="text-1-6-1">
+<ul class="org-ul">
+<li>Lirc-Konfiguration
+</li>
+<li>VDR-Konfiguration
+</li>
+<li>Bildschirm(e)
+</li>
+<li>Audioausgabe
+</li>
+<li>Logdateien
+</li>
+<li>Dashboard mit Systemstatus, Temperaturen, Festplattenbelegung usw.
+</li>
+<li>Kanallisteneditor mit Channelpedia-Anbindung
+</li>
+<li>System herunterfahren, neu starten, ggf. schlanke Fernbedienung für Mobil-Geräte
+</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-1-7" class="outline-3">
+<h3 id="sec-1-7"><span class="section-number-3">1.7</span> Metapakete für verschiedene Systemkonfigurationen:</h3>
+<div class="outline-text-3" id="text-1-7">
+<p>
+Für die möglichen Installationsvarianten könnte man dann z.B. diese Metapakete zusammenstellen, für die es jeweils einen eigenen preseed geben sollte:
+</p>
+</div>
+<div id="outline-container-sec-1-7-1" class="outline-4">
+<h4 id="sec-1-7-1"><span class="section-number-4">1.7.1</span> yavdr-server</h4>
+<div class="outline-text-4" id="text-1-7-1">
+</div><ol class="org-ol"><li><a id="sec-1-7-1-1" name="sec-1-7-1-1"></a>Abhängigkeiten<br  /><div class="outline-text-5" id="text-1-7-1-1">
+<ul class="org-ul">
+<li>yavdr-core
+</li>
+<li>yavdr-webfrontend
+</li>
+<li>nfs-kernel-server
+</li>
+<li>nfs-utils
+</li>
+<li>samba-server
+</li>
+</ul>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-7-2" class="outline-4">
+<h4 id="sec-1-7-2"><span class="section-number-4">1.7.2</span> yavdr-xorg-full</h4>
+<div class="outline-text-4" id="text-1-7-2">
+</div><ol class="org-ol"><li><a id="sec-1-7-2-1" name="sec-1-7-2-1"></a>Abhängigkeiten<br  /><div class="outline-text-5" id="text-1-7-2-1">
+<ul class="org-ul">
+<li>yavdr-network
+</li>
+<li>yavdr-remote
+</li>
+<li>yavdr-server
+</li>
+<li>yavdr-xorg
+</li>
+<li>vdr-plugin-softhddevice
+</li>
+<li>vdr-plugin-streamdev-server
+</li>
+<li>vdr-plugin-vnsiserver
+</li>
+<li>vdr-plugin-markad
+</li>
+<li>vdr-plugin-dbus2vdr
+</li>
+<li>vdr-plugin-dynamite
+</li>
+<li>vdr-plugin-graphtftng
+</li>
+<li>kodi
+</li>
+<li>kodi-eventclients-xbmc-send
+</li>
+</ul>
+</div>
+</li></ol>
+</div>
+<div id="outline-container-sec-1-7-3" class="outline-4">
+<h4 id="sec-1-7-3"><span class="section-number-4">1.7.3</span> yavdr-xorg-client</h4>
+<div class="outline-text-4" id="text-1-7-3">
+</div><ol class="org-ol"><li><a id="sec-1-7-3-1" name="sec-1-7-3-1"></a>Abhängigkeiten<br  /><div class="outline-text-5" id="text-1-7-3-1">
+<ul class="org-ul">
+<li>yavdr-network
+</li>
+<li>yavdr-remote
+</li>
+<li>yavdr-server
+</li>
+<li>yavdr-xorg
+</li>
+<li>vdr-plugin-softhddevice
+</li>
+<li>kodi
+</li>
+<li>kodi-eventclients-xbmc-send
+</li>
+<li>kodi-pvr-vdr-vnsi
+</li>
+<li>vdr-plugin-streamdev-client
+</li>
+<li>vdr-plugin-satip
+</li>
+</ul>
+</div>
+</li></ol>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-2" class="outline-2">
+<h2 id="sec-2"><span class="section-number-2">2</span> eventlircd</h2>
+<div class="outline-text-2" id="text-2">
+</div><div id="outline-container-sec-2-1" class="outline-3">
+<h3 id="sec-2-1"><span class="section-number-3">2.1</span> <span class="todo TODO">TODO</span> udev-Regeln überarbeiten</h3>
+<div class="outline-text-3" id="text-2-1">
+<ul class="org-ul">
+<li>Vorlage für eine udev-Regel für neue Fernbedienungen erstellen
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-sec-2-2" class="outline-3">
+<h3 id="sec-2-2"><span class="section-number-3">2.2</span> <span class="todo WAIT">WAIT</span> lircd_helper-Skript anpassen</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+Nach Anpassung von lircd2uinput und neuem lircd@.service auf neue Syntax anpassen
+</p>
+</div>
+</div>
+</div>
+
+<div id="outline-container-sec-3" class="outline-2">
+<h2 id="sec-3"><span class="section-number-2">3</span> Verzeichnisstruktur</h2>
+<div class="outline-text-2" id="text-3">
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+
+
+<colgroup>
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+
+<col  class="left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="left">Kategorie</th>
+<th scope="col" class="left">Pfad</th>
+<th scope="col" class="left">NFS</th>
+<th scope="col" class="left">SAMBA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="left">Bilder</td>
+<td class="left">/srv/images</td>
+<td class="left">/srv/images</td>
+<td class="left">images</td>
+</tr>
+
+<tr>
+<td class="left">Musik</td>
+<td class="left">/srv/audio</td>
+<td class="left">/srv/audio</td>
+<td class="left">audio</td>
+</tr>
+
+<tr>
+<td class="left">Videos</td>
+<td class="left">/srv/video</td>
+<td class="left">/srv/video</td>
+<td class="left">video</td>
+</tr>
+
+<tr>
+<td class="left">Aufnahmen</td>
+<td class="left">/srv/vdr/video</td>
+<td class="left">/srv/vdr/video</td>
+<td class="left">recordings</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Alexander Grothe</p>
+<p class="date">Created: 2016-02-02 Di 15:41</p>
+<p class="creator"><a href="http://www.gnu.org/software/emacs/">Emacs</a> 24.5.1 (<a href="http://orgmode.org">Org</a> mode 8.2.10)</p>
+<p class="validation"><a href="http://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>

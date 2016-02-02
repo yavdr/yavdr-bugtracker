@@ -1,0 +1,202 @@
+#+TITLE: RFC yaVDR 0.7
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="styles/bigblow/css/htmlize.css"/>
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="styles/bigblow/css/bigblow.css"/>
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="styles/bigblow/css/hideshow.css"/>
+
+#+HTML_HEAD: <script type="text/javascript" src="styles/bigblow/js/jquery-1.11.0.min.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="styles/bigblow/js/jquery-ui-1.10.2.min.js"></script>
+
+#+HTML_HEAD: <script type="text/javascript" src="styles/bigblow/js/jquery.localscroll-min.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="styles/bigblow/js/jquery.scrollTo-1.4.3.1-min.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="styles/bigblow/js/jquery.zclip.min.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="styles/bigblow/js/bigblow.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="styles/bigblow/js/hideshow.js"></script>
+#+HTML_HEAD: <script type="text/javascript" src="styles/lib/js/jquery.stickytableheaders.min.js"></script>
+
+#+FILETAGS: :yaVDR:@Computer:@Sparetime
+#+OPTIONS: ^:nil
+#+bind: org-export-publishing-directory "~/Dropbox/Public/yaVDR"
+
+* Paketstruktur für yaVDR 0.7
+Um einen möglichst modularen Aufbau für yaVDR 0.7 zu erreichen, werden die folgenden Kernpakete definiert:
+** yavdr-core
+Andere yavdr-* Pakete dürfen Abhängigkeiten zu diesem Paket besitzen
+*** Abhängigkeiten:
+**** linux-firmware
+**** linux-firmware-nonfree
+**** linux-firmware-yavdr
+**** vdr
+***** TODO udev-Regel für DVB-Geräte, um das Warten auf Geräte zu vereinfachen:
+#+BEGIN_SRC udev
+SUBSYSTEM=="dvb", TAG+="systemd"
+#+END_SRC
+Damit kann mit so einem Snippet auf DVB-Karten gewartet werden:
+*/etc/systemd/system/vdr.service.d/wait-for-dvb.conf*
+#+BEGIN_SRC conf
+[Unit]
+Wants=dev-dvb-adapter0-frontend0.device
+Wants=dev-dvb-adapter0-demux0.device
+Wants=dev-dvb-adapter0-dvr0.device
+Wants=dev-dvb-adapter0-net0.device
+After=dev-dvb-adapter0-frontend0.device
+After=dev-dvb-adapter0-demux0.device
+After=dev-dvb-adapter0-dvr0.device
+After=dev-dvb-adapter0-net0.device
+#+END_SRC
+
+Alternativ auch eine eigene Unit wait-for-dvb@.service, die vor dem VDR gestartet werden muss und die man jeweils von Hand für eine bestimmte Adapter-Nummer aktiviert:
+
+#+BEGIN_SRC conf
+[Unit]
+Wants=dev-dvb-adapter%i-frontend0.device
+Wants=dev-dvb-adapter%i-demux0.device
+Wants=dev-dvb-adapter%i-dvr0.device
+Wants=dev-dvb-adapter%i-net0.device
+After=dev-dvb-adapter%i-frontend0.device
+After=dev-dvb-adapter%i-demux0.device
+After=dev-dvb-adapter%i-dvr0.device
+After=dev-dvb-adapter%i-net0.device
+Before=vdr
+WantedBy=vdr
+
+[Install]
+WantedBy=multi-user.target
+#+END_SRC
+
+Und die kann man dann z.B. mit systemctl enable wait-for-dvb@0.service aktivieren.
+***** TODO Fixes aus Debian-Paketen übernehmen, PR an Lars
+**** vdrctl
+erleichtert die Konfiguration der Startoptionen für den VDR
+
+**** vdr-addon-lifeguard(ng)
+***** TODO ggf. durch lifeguard-ng ersetzen, das nicht mehr als Hook, sondern als Systemdienst läuft und Shutdown-Inhibitoren setzt, wenn der Rechner nicht heruntergefahren werden darf.
+***** TODO DBus-Interface, um aktuellen Status abzufragen und Inhibitoren zu setzen.
+**** vdr-addon-acpiwakeup(ng)
+***** TODO durch acpi-wakeupng ersetzen, das als Dienst läuft und auch von anderen Clients wie z.B. KODI Aufwachzeiten übernehmen kann
+****** SOMEDAY nvram-wakeup unterstützen
+**** vim
+Damit wenigstens ein vernünftiger Texteditor dabei ist ;)
+** yavdr-remote
+Paket mit allen Konfigurationsdateien und Skripten für Fernbedienungen mit folgenden
+*** Abhängigkeiten
+**** ir-keytable
+für die Konfiguration von rc-core Geräten
+**** eventlircd
+liest Events von Kernel Input Devices, die das udev-Attribut ENV{eventlircd_enable}="true" besitzen und gibt diese auf einem Lircd-kompatiblen Sockel */run/lirc/lircd* aus. Mittels ENV{eventlircd_evmap}="<evmap>" kann eine Datei übergeben werden, die ein Remapping der Tasten erlaubt. Diese Funktionalität wird genutzt, um namespace-konforme Tastendrücke zu erhalten.
+**** lircd2uinput
+liest von einem oder mehreren Lircd-kompatiblen Sockeln und reicht die Tastendrücke über uinput weiter.
+Wird es ohne Argumente gestartet, sucht es nach einer */var/run/lircd/lircd.pid* und bindet sich bei Erfolg an den dazugehörigen Lirc-Sockel. Wird mit dem Argument -s der Pfad für einen Sockel übergeben, liest es von diesem. 
+Es erzeugt ein DBus-Interface auf *de.yavdr.lircd2unput* und kann darüber Steuerungsbefehle annehmen, um Lircd-kompatible Sockel zur Auswertung hinzuzufügen, zu entfernen oder Tastendrücke abzusetzen.
+Folgende Beispielskripte liegen bei:
+- lircd2uinput-send KEY_NAME: sendet einen Tastendrück
+- lircd2uinput-add <Pfad> [<key_up_suffix>]: lässt lircd2uinput einen weiteren Sockel auswerten, das key_up_suffix kann genutzt werden, um das Loslassen einer Taste anzuzeigen (wie es z.B. bei lircd mit --release[=suffix] erzeugt werden kann).
+- lircd2uinput-remove <Pfad>: beendet die Auswertung eines Sockels
+**** lirc
+Wertet die Events der klassischen Fernbedienungen aus. 
+**** irserver
+Daemon für die iRTrans-Geräte. Bekommt eine udev-Regel, die den (noch zu schreibenden) Service irserver@.service startet.
+***** TODO systemd Service irserver@.service schreiben
+**** ps3remote
+Daemon, der von PS3-Fernbedienungen liest und die Tastendrücke für eventlircd aufbereitet
+***** TODO für Python3 überarbeiten, vereinfachen
+*** Arbeitsliste für yavdr-remote
+**** TODO systemd-Unit lircd.service schreiben, die mit den bestehenden Konfigurationsdateien umgehen kann
+**** TODO Snippet, der lircd2uinput über den neuen Sockel informiert, wenn lircd.service gestartet wurde
+**** TODO Snippet, der lircd2uinput über den neuen Sockel informiert, wenn irserver@.service gestartet wurde
+**** TODO systemd-Unit lircd@.service schreiben, die weitere Lircd-Instanzen für über udev einbindbare Geräte erlaubt
+**** TODO udev-Regel und irserver@.service für irtrans-USB Geräte anlegen:
+#+BEGIN_SRC udev
+SUBSYSTEM=="tty", DRIVERS=="ftdi_sio", ATTRS{interface}=="IRTrans USB", ACTION=="add", LINK="irserver-%n", TAG+="systemd", ENV{SYSTEMD_WANTS}+="irserver@irserver-%n.service"
+#+END_SRC
+** yavdr-xorg
+Bringt alles mit, um einen X-Server mit openbox als Window Manager zu starten und das VDR-Frontend (Voreinstellung: softhddevice) anzuzeigen.
+*** Abhängigkeiten
+- feh
+- openbox
+- gnome-icon-theme
+- i965-va-driver
+- vdr-frontend
+- x11-utils
+- x11-xserver-utils
+- xfonts-base
+- xterm
+- xserver-xorg
+- xserver-xorg-video-vesa
+- xserver-xorg-video-intel
+** yavdr-pulseaudio
+Erlaubt es pulseaudio zu nutzen
+*** Abhängigkeiten
+- pulseaudio
+- pulseaudio-utils
+- pavucontrol
+** yavdr-network
+Netzwerkfunktionalität für yaVDR
+*** Abhängigkeiten
+**** vdr-addon-avahi-mounter
+**** yavdr-hostwakeup
+**** vdr-plugin-avahi4vdr
+**** vdr-plugin-restfulapi
+** yavdr-webfrontend
+Erlaubt die Konfiguration des Systems über ein Webinterface.
+*** Gewünschte Funktionen:
+- Lirc-Konfiguration
+- VDR-Konfiguration
+- Bildschirm(e)
+- Audioausgabe
+- Logdateien
+- Dashboard mit Systemstatus, Temperaturen, Festplattenbelegung usw.
+- Kanallisteneditor mit Channelpedia-Anbindung
+- System herunterfahren, neu starten, ggf. schlanke Fernbedienung für Mobil-Geräte
+
+** Metapakete für verschiedene Systemkonfigurationen:
+Für die möglichen Installationsvarianten könnte man dann z.B. diese Metapakete zusammenstellen, für die es jeweils einen eigenen preseed geben sollte:
+*** yavdr-server
+**** Abhängigkeiten
+- yavdr-core
+- yavdr-webfrontend
+- nfs-kernel-server
+- nfs-utils
+- samba-server
+*** yavdr-xorg-full
+**** Abhängigkeiten
+- yavdr-network
+- yavdr-remote
+- yavdr-server
+- yavdr-xorg
+- vdr-plugin-softhddevice
+- vdr-plugin-streamdev-server
+- vdr-plugin-vnsiserver
+- vdr-plugin-markad
+- vdr-plugin-dbus2vdr
+- vdr-plugin-dynamite
+- vdr-plugin-graphtftng
+- kodi
+- kodi-eventclients-xbmc-send
+*** yavdr-xorg-client
+**** Abhängigkeiten
+- yavdr-network
+- yavdr-remote
+- yavdr-server
+- yavdr-xorg
+- vdr-plugin-softhddevice
+- kodi
+- kodi-eventclients-xbmc-send
+- kodi-pvr-vdr-vnsi
+- vdr-plugin-streamdev-client
+- vdr-plugin-satip
+
+* eventlircd
+** TODO udev-Regeln überarbeiten
+- Vorlage für eine udev-Regel für neue Fernbedienungen erstellen
+** WAIT lircd_helper-Skript anpassen
+Nach Anpassung von lircd2uinput und neuem lircd@.service auf neue Syntax anpassen
+
+* Verzeichnisstruktur
+| Kategorie | Pfad           | NFS            | SAMBA      |
+|-----------+----------------+----------------+------------|
+| Bilder    | /srv/images    | /srv/images    | images     |
+| Musik     | /srv/audio     | /srv/audio     | audio      |
+| Videos    | /srv/video     | /srv/video     | video      |
+| Aufnahmen | /srv/vdr/video | /srv/vdr/video | recordings |
+
+
