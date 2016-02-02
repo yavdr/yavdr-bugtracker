@@ -139,7 +139,7 @@ Netzwerkfunktionalität für yaVDR
 ** yavdr-webfrontend
 Erlaubt die Konfiguration des Systems über ein Webinterface.
 *** Gewünschte Funktionen:
-- Lirc-Konfiguration
+- Konfiguration für Lircd und Sundtek-Fernbedienungen
 - VDR-Konfiguration
 - Bildschirm(e)
 - Audioausgabe
